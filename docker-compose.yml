@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  project-management:
+    build: .
+    container_name: project-management
+    ports:
+      - "82:80"
+    restart: unless-stopped
+    networks:
+      - app_net
+
