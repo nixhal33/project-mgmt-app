@@ -1,0 +1,51 @@
+name: CI - Dev
+
+on:
+  push:
+    branches: [dev]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/project-management:dev
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to Dev Server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEV_HOST }}
+          username: ${{ secrets.DEV_USER }}
+          key: ${{ secrets.DEV_SSH_KEY }}
+          script: |
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/project-management:dev
+
+            if [ "$(docker ps -aq -f name=project-management-dev)" ]; then
+              docker stop project-management-dev
+              docker rm project-management-dev
+            fi
+
+            docker run -d \
+              --name project-management-dev \
+              --restart unless-stopped \
+              -p 3000:80 \
+              ${{ secrets.DOCKERHUB_USERNAME }}/project-management:dev
+
+            docker image prune -f
