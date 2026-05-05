@@ -1,0 +1,20 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $aws_reg | docker login --username AWS --password-stdin $aws_acc_id.dkr.ecr.$aws_reg.amazonaws.com
+      - echo Login successful.
+  build:
+    commands:
+      - echo Extracting branch name...
+      - BRANCH_NAME=$(echo $CODEBUILD_WEBHOOK_HEAD_REF | sed 's/refs\/heads\///')
+      - echo Building the Docker image for branch $BRANCH_NAME...
+      - docker build -t project-mgmt-app:latest .
+      - echo Tagging the Docker image...
+      - docker tag project-mgmt-app:latest $aws_acc_id.dkr.ecr.$aws_reg.amazonaws.com/$img_repo_name:$BRANCH_NAME
+  post_build:
+    commands:
+      - echo Pushing the Docker image...
+      - docker push $aws_acc_id.dkr.ecr.$aws_reg.amazonaws.com/$img_repo_name:$BRANCH_NAME
