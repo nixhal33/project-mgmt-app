@@ -18,4 +18,4 @@ phases:
     commands:
       - echo Pushing the Docker image...
       - docker push $aws_acc_id.dkr.ecr.$aws_reg.amazonaws.com/$img_repo_name:$BRANCH_NAME
-      - echo new project created in code build.
+      - echo new project created in code build
