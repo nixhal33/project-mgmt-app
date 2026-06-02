@@ -1,4 +1,4 @@
-# New Dockerfile Added To the System
+# New Dockerfile Added
 # 1. CHANGE THIS LINE from alpine to slim
 FROM node:20-slim AS builder
 WORKDIR /app
