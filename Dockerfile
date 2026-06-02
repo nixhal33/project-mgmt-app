@@ -1,15 +1,15 @@
-# New Dockerfile Added
-# 1. CHANGE THIS LINE from alpine to slim
+# Build stage
 FROM node:20-slim AS builder
 WORKDIR /app
 COPY package*.json ./
 
-# 2. This will now run perfectly without crashing
-RUN npm ci
+# SWAP npm ci for npm install to bypass the lockfile platform lock
+RUN npm install
+
 COPY . .
 RUN npm run build
 
-# Serve stage (Keep this Nginx Alpine image exactly as it is!) 
+# Serve stage
 FROM nginx:alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
