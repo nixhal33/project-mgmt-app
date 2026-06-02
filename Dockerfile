@@ -3,7 +3,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
-RUN npm install @rollup/rollup-linux-x64-musl
+RUN npm config set libc musl
 COPY . .
 RUN npm run build
 
