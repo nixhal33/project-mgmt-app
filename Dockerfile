@@ -3,7 +3,7 @@ FROM node:20-slim AS builder
 WORKDIR /app
 COPY package*.json ./
 
-# SWAP npm ci for npm install to bypass the lockfile platform lock
+# SWAP npm ci for npm install to bypass the lockfile platform lock fullproof let's see
 RUN npm install
 
 COPY . .
